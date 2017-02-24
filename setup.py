@@ -1,12 +1,13 @@
 from setuptools import setup, find_packages
+
 setup(
-      name="zcy_test",
+      name="pycreeper",
       version="0.0.1",
-      description="My test module",
+      description='''Creepers feel like a web crawler:
+                       slow growth and and wide coverage.''',
       author="zcy",
-      author_email="zcy19941015@qq.com",
-      url="http://www.csdn.net",
+      author_email="zhengchenyu.backend@gmail.com",
+      url="http://blog.csdn.net/zcy19941015",
       license="LGPL",
-      packages= find_packages(),
-      scripts=["zcy_test/test1.py"],
+      packages=find_packages(exclude=('tests', 'tests.*'))
       )
