@@ -1,4 +1,4 @@
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 reload(__import__('sys')).setdefaultencoding('utf-8')
 __author__ = 'zcy'
 
@@ -23,6 +23,7 @@ class Engine(object):
     """ Engine """
 
     def __init__(self, spider):
+        # TODO: logger is related to settings, so we should maintain a global logger.
         self.spider = spider
         self.scheduler = Scheduler()
         self.downloader = Downloader(spider)

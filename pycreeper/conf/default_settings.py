@@ -4,6 +4,8 @@ __author__ = 'zcy'
 
 """ default config settings """
 
+LOG_LEVEL = 'DEBUG'
+
 RETRY_COUNT = 3
 
 RETRY_STATUS_CODES = [500, 502, 503, 504, 400, 403, 408]
