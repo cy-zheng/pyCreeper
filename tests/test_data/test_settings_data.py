@@ -22,4 +22,4 @@ TEST_LIST = [
 
 TEST_FLOAT = 9.11
 
-test_lowcase = True
+test_lowercase = True

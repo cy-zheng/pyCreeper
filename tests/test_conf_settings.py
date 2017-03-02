@@ -27,7 +27,7 @@ class SettingsTest(unittest.TestCase):
         self.assertEqual(settings['TEST_STR'], 'foo,bar,baz')
         settings = Settings(CONF_PATH)
         self.assertEqual(settings['TEST_STR'], 'foo,bar,baz')
-        self.assertRaises(KeyError, settings['test_lowcase'])
+        self.assertRaises(KeyError, settings['test_lowercase'])
 
     def test_set(self):
         settings = Settings(test_settings_data)
