@@ -5,24 +5,27 @@ __author__ = 'zcy'
 """ Scheduler """
 
 from gevent.queue import Queue
-
+from logging import Logger
 from pybloom import ScalableBloomFilter
-from utils import logger, request_fingerprint
+from utils.hash import request_fingerprint
 
 
 class Scheduler(object):
     """ Scheduler """
 
-    def __init__(self):
+    def __init__(self, logger):
         self.request_filter = RequestFilter()
         self.queue = Queue()
+        if not isinstance(logger, Logger):
+            raise AttributeError('logger must be instance of logging.Logger')
+        self.logger = logger
 
     def enqueue_request(self, request):
         """put request
         """
         if not request.dont_filter \
                 and self.request_filter.request_seen(request):
-            logger.warn("ignore %s", request.url)
+            self.logger.warn("ignore %s", request.url)
             return
         self.queue.put(request)
 
