@@ -7,7 +7,7 @@ __author__ = 'zcy'
 from gevent.queue import Queue
 from pybloom import ScalableBloomFilter
 
-from utils.hash import request_fingerprint
+from pycreeper.utils.hash import request_fingerprint
 
 
 class Scheduler(object):

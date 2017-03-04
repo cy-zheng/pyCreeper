@@ -6,11 +6,8 @@ import random
 import time
 from urlparse import urlparse
 from logging import Logger
-
 import chardet
-
 import gevent
-
 from pycreeper.downloader_middlewares import DownloaderMiddleware
 
 

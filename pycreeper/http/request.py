@@ -4,8 +4,7 @@ __author__ = 'zcy'
 
 import six
 from w3lib.url import safe_url_string
-
-from headers import Headers
+from pycreeper.http.headers import Headers
 
 
 class Request(object):

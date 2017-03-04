@@ -5,9 +5,7 @@ __author__ = 'zcy'
 """ Response Object """
 
 import six
-
 from w3lib.url import safe_url_string
-
 from pycreeper.http.headers import Headers
 from pycreeper.http.request import Request
 
