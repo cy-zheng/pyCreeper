@@ -9,23 +9,23 @@ monkey.patch_all()
 
 import logging
 
-import gevent
 from gevent.pool import Pool
 
-from scheduler import Scheduler
-from downloader.downloader import Downloader
-from utils.gevent import spawn, join_all
-from utils import result2list
-from http.request import Request
+from pycreeper.scheduler import Scheduler
+from pycreeper.downloader import Downloader
+from pycreeper.utils.gevent_wrapper import spawn, join_all
+from pycreeper.utils import result2list
+from pycreeper.http.request import Request
+from Queue import Empty
 
 
 class Engine(object):
     """ Engine """
 
     def __init__(self, spider):
-        # TODO: logger is related to settings, so we should maintain a global logger.
         self.spider = spider
-        self.scheduler = Scheduler()
+        self.logger = spider.logger
+        self.scheduler = Scheduler(spider)
         self.downloader = Downloader(spider)
         self.settings = spider.settings
         max_request_size = self.settings["MAX_REQUEST_SIZE"]
@@ -56,12 +56,13 @@ class Engine(object):
         """next request
         """
         while True:
-            request = self.scheduler.next_request()
-            if not request:
-                gevent.sleep(0)
-                continue
-            self.pool.spawn(
-                self._process_request, request, spider)
+            try:
+                request = self.scheduler.next_request()
+                self.pool.spawn(
+                    self._process_request, request, spider)
+            except Empty:
+                self.logger.info('All requests are finished, program exit...')
+                return
 
     def _process_request(self, request, spider):
         """process request
@@ -85,9 +86,8 @@ class Engine(object):
         return response
 
     def _handle_downloader_output(self, response, request, spider):
-        """hanlde downloader output
+        """handle downloader output
 
-        TODO: why downloader could return a Request?
 
         """
         if isinstance(response, Request):

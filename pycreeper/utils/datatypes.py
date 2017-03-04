@@ -45,7 +45,7 @@ class CaselessDict(dict):
         return dict.setdefault(self, self.normkey(key), self.normvalue(def_val))
 
     def update(self, seq):
-        seq = seq.items() if isinstance(seq, dict) else seq
+        seq = seq.items()
         iseq = ((self.normkey(k), self.normvalue(v)) for k, v in seq)
         super(CaselessDict, self).update(iseq)
 

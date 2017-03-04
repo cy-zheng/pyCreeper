@@ -5,20 +5,19 @@ __author__ = 'zcy'
 """ Scheduler """
 
 from gevent.queue import Queue
-from logging import Logger
 from pybloom import ScalableBloomFilter
+
 from utils.hash import request_fingerprint
 
 
 class Scheduler(object):
     """ Scheduler """
 
-    def __init__(self, logger):
+    def __init__(self, spider):
         self.request_filter = RequestFilter()
         self.queue = Queue()
-        if not isinstance(logger, Logger):
-            raise AttributeError('logger must be instance of logging.Logger')
-        self.logger = logger
+        self.settings = spider.settings
+        self.logger = spider.logger
 
     def enqueue_request(self, request):
         """put request
@@ -32,9 +31,8 @@ class Scheduler(object):
     def next_request(self):
         """next request
         """
-        if self.queue.empty():
-            return None
-        return self.queue.get()
+        timeout = self.settings.get('TIMEOUT', 5)
+        return self.queue.get(timeout=timeout * 3)
 
     def __len__(self):
         return self.queue.qsize()

@@ -4,9 +4,12 @@ __author__ = 'zcy'
 
 """ Base Spider"""
 
-from conf.settings import Settings
-from http.request import Request
-from engine import Engine
+import json
+
+from pycreeper.conf.settings import Settings
+from pycreeper.http.request import Request
+from pycreeper.engine import Engine
+from pycreeper.utils.log import get_logger
 
 
 class Spider(object):
@@ -19,7 +22,7 @@ class Spider(object):
             self.start_urls = []
         # init settings
         self.settings = Settings(self.custom_settings)
-
+        self.logger = get_logger(self.settings)
         self.initialize()
 
     def initialize(self):
@@ -47,4 +50,4 @@ class Spider(object):
     def process_item(self, item):
         """process item
         """
-        pass
+        self.logger.debug(json.dumps(item))

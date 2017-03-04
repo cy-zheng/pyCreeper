@@ -22,7 +22,7 @@ class Request(object):
         self.cookies = cookies or {}
         self.headers = Headers(headers or {}, encoding=encoding)
         self.dont_filter = dont_filter
-        self._meta = dict(meta) if meta else {}
+        self.meta = dict(meta) if meta else {}
 
     @property
     def encoding(self):
@@ -61,12 +61,10 @@ class Request(object):
             self._body = body.encode(self._encoding)
         elif body is None:
             self._body = ''
+        elif isinstance(body, dict):
+            self._body = body
         else:
-            raise TypeError("Request body must either str or unicode. Got: '%s'" % type(body).__name__)
-
-    @property
-    def meta(self):
-        return self._meta
+            raise TypeError("Request body must either str, unicode or dict. Got: '%s'" % type(body).__name__)
 
     def copy(self, *args, **kwargs):
         """ copy """

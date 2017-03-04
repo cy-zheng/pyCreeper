@@ -10,7 +10,7 @@ RETRY_COUNT = 3
 
 RETRY_STATUS_CODES = [500, 502, 503, 504, 400, 403, 408]
 
-TIMEOUT = 10
+TIMEOUT = 5
 
 DEFAULT_HEADERS = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;'
@@ -18,12 +18,12 @@ DEFAULT_HEADERS = {
     'Accept-Language': 'zh-CN,zh;q=0.8,en;q=0.6',
 }
 
-PROXY_ENABLED = False
-
 MAX_REQUEST_SIZE = 30
 
-PROXY_FILE = "proxy_list.txt"
+PROXY_ENABLED = False
 PROXY_INTERVAL = 5
+PROXY_LIST = []
+
 
 USER_AGENT_LIST = [
     'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31',
@@ -52,3 +52,5 @@ USER_AGENT_LIST = [
     "Mozilla/5.0 (Windows; U; Windows NT 5.2) AppleWebKit/525.13 (KHTML, like Gecko) Version/3.1 Safari/525.13",
     "Mozilla/5.0 (iPhone; U; CPU like Mac OS X) AppleWebKit/420.1 (KHTML, like Gecko) Version/3.0 Mobile/4A93 Safari/419.3",
 ]
+
+DOWNLOADER_MIDDLEWARES = {}
