@@ -50,7 +50,7 @@ class DownloadHandler(object):
         session = self._get_session(url)
         self.logger.info("processing %s", url)
         if request.method == 'GET':
-            response = session.get(url, **kwargs)
+            response = session.get(url, allow_redirects=False, **kwargs)
         elif request.method == 'POST':
             if request.body:
                 kwargs.update(data=request.body)

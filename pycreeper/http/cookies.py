@@ -10,7 +10,7 @@ from cookielib import (
     IPV4_RE
 )
 from urlparse import urlparse
-
+from pycreeper.utils import to_native_str
 
 
 class CookieJar(object):
@@ -32,7 +32,7 @@ class CookieJar(object):
 
         # the cookiejar implementation iterates through all domains
         # instead we restrict to potential matches on the domain
-        req_host = urlparse(request).hostname
+        req_host = urlparse(wreq.get_full_url()).hostname
         if not req_host:
             return
 
@@ -117,7 +117,7 @@ class _DummyLock(object):
 
 
 class WrappedRequest(object):
-    """Wraps a scrapy Request class with methods defined by urllib2.Request class to interact with CookieJar class
+    """Wraps a pycreeper Request class with methods defined by urllib2.Request class to interact with CookieJar class
 
     see http://docs.python.org/library/urllib2.html#urllib2.Request
     """
