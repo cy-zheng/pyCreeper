@@ -39,7 +39,7 @@ class DownloadHandler(object):
         """
         proxy = request.meta.get("proxy")
         kwargs = {
-            "headers": request.headers,
+            "headers": request.headers.to_dict(),
             "timeout": self.settings["TIMEOUT"],
         }
         if proxy:
@@ -50,11 +50,11 @@ class DownloadHandler(object):
         session = self._get_session(url)
         self.logger.info("processing %s", url)
         if request.method == 'GET':
-            response = session.get(url, allow_redirects=False, **kwargs)
+            response = requests.get(url, allow_redirects=False, **kwargs)
         elif request.method == 'POST':
             if request.body:
                 kwargs.update(data=request.body)
-            response = session.post(url, **kwargs)
+            response = requests.post(url, **kwargs)
         else:
             raise ValueError('Unacceptable HTTP verb %s' % request.method)
         return Response(response.url, request, response.status_code,

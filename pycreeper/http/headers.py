@@ -83,6 +83,12 @@ class Headers(CaselessDict):
     def to_string(self):
         return headers_dict_to_raw(self)
 
+    def to_dict(self):
+        temp = {}
+        for key in self:
+            temp[key] = '; '.join(self.getlist(key))
+        return temp
+
     def __copy__(self):
         return self.__class__(self)
 

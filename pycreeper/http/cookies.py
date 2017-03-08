@@ -51,7 +51,7 @@ class CookieJar(object):
         attrs = self.jar._cookie_attrs(cookies)
         if attrs:
             if not wreq.has_header("Cookie"):
-                wreq.add_unredirected_header("Cookie", "; ".join(attrs))
+                wreq.add_unredirected_header("Cookie", attrs)
 
         self.processed += 1
         if self.processed % self.check_expired_frequency == 0:
@@ -184,7 +184,6 @@ class WrappedRequest(object):
 
     def add_unredirected_header(self, name, value):
         self.request.headers.appendlist(name, value)
-
 
 class WrappedResponse(object):
 

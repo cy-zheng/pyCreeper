@@ -9,7 +9,6 @@ from logging import Logger
 import chardet
 import gevent
 from pycreeper.downloader_middlewares import DownloaderMiddleware
-import os
 import six
 from collections import defaultdict
 
@@ -141,7 +140,8 @@ class CookiesMiddleware(object):
     def process_request(self, request):
         if request.meta.get('dont_merge_cookies', False):
             return
-
+        if not request.meta or request.meta.get("cookiejar", None) is None:
+            return
         cookiejarkey = request.meta.get("cookiejar")
         jar = self.jars[cookiejarkey]
         cookies = self._get_request_cookies(jar, request)
@@ -158,17 +158,17 @@ class CookiesMiddleware(object):
                            for k, v in six.iteritems(request.cookies)]
         else:
             cookie_list = request.cookies
-
         cookies = [self._format_cookie(x) for x in cookie_list]
         headers = {'Set-Cookie': cookies}
-        response = Response(request.url, headers=headers)
+        response = Response(request.url, request, headers=headers)
 
         return jar.make_cookies(response, request)
 
-    def process_response(self, request, response, spider):
+    def process_response(self, request, response):
         if request.meta.get('dont_merge_cookies', False):
             return response
-
+        if not request.meta or request.meta.get("cookiejar", None) is None:
+            return response
         # extract cookies from Set-Cookie and drop invalid/expired cookies
         cookiejarkey = request.meta.get("cookiejar")
         jar = self.jars[cookiejarkey]
