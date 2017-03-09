@@ -4,14 +4,12 @@ __author__ = 'zcy'
 
 
 import unittest
-import requests
 import json
-from pycreeper.http.cookies import CookieJar, potential_domain_matches
+from pycreeper.http.cookies import CookieJar
 from pycreeper.http.request import Request
-from pycreeper.http.response import Response
 from pycreeper.downloader import DownloadHandler
 from pycreeper.spider import Spider
-from pycreeper.downloader_middlewares.middlewares import CookiesMiddleware
+from pycreeper.downloader_middlewares.cookies_middlewares import CookiesMiddleware
 
 HTTPBIN_URL = 'http://httpbin.org'
 
@@ -60,6 +58,36 @@ class CookieMiddlewaresTest(unittest.TestCase):
                              "key1": "val1",
                              "key2": 'val2',
                          })
+
+    def test_process_request_set_cookie_with_same_cookiejar(self):
+        request = Request(
+            HTTPBIN_URL + '/cookies',
+            meta={
+                'cookiejar': 'test'
+            },
+            cookies={
+                'key1': 'val1',
+            }
+        )
+        self.cookie_middlerwares.process_request(request)
+        self.downloader.fetch(request)
+        request = Request(
+            HTTPBIN_URL + '/cookies',
+            meta={
+                'cookiejar': 'test'
+            },
+            cookies={
+                'key2': 'val2',
+            }
+        )
+        self.cookie_middlerwares.process_request(request)
+        response = self.downloader.fetch(request)
+        self.assertEqual(json.loads(response.body)['cookies'],
+                         {
+                             "key1": "val1",
+                             "key2": 'val2',
+                         })
+
 
     def test_process_request_set_cookie_without_cookiejar(self):
         request = Request(

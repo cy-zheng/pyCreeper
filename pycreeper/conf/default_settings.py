@@ -24,6 +24,8 @@ PROXY_ENABLED = False
 PROXY_INTERVAL = 5
 PROXY_LIST = []
 
+MAX_REDIRECT_COUNT = 10
+
 
 USER_AGENT_LIST = [
     'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31',
