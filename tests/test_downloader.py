@@ -24,14 +24,6 @@ class DownloadHandlerTest(unittest.TestCase):
     def setUp(self):
         self.spider = Spider()
 
-    def test_get_session(self):
-        dh = DownloadHandler(self.spider)
-        self.assertIsInstance(dh._get_session(HTTPBIN_URL + '/delay/10'), Session)
-        self.assertIs(
-            dh._get_session(HTTPBIN_URL + '/delay/10'),
-            dh._get_session(HTTPBIN_URL + '/ip'),
-        )
-
     def test_concurrency_with_delayed_url(self):
         dh = DownloadHandler(self.spider)
         n = 5

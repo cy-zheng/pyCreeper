@@ -56,3 +56,9 @@ USER_AGENT_LIST = [
 ]
 
 DOWNLOADER_MIDDLEWARES = {}
+
+"dynamic crawl"
+
+DYNAMIC_CRAWL = True
+
+DRIVER = 'Firefox'

@@ -12,7 +12,8 @@ class Request(object):
 
     def __init__(self, url, callback=None, method='GET', headers=None,
                  body=None, cookies=None, meta=None, encoding='utf-8',
-                 dont_filter=False):
+                 dont_filter=False, dynamic=False, browser_actions=[],
+                 wait=0):
         self._encoding = encoding
         self.url = url
         self.body = body
@@ -22,6 +23,15 @@ class Request(object):
         self.headers = Headers(headers or {}, encoding=encoding)
         self.dont_filter = dont_filter
         self.meta = dict(meta) if meta else {}
+        self.dynamic = bool(dynamic)
+        if self.dynamic:
+            if self.method == 'POST':
+                raise AttributeError('Pycreeper can\'t make a dynamic POST request.')
+            self.browser_actions = browser_actions
+            self.wait = int(wait)
+        else:
+            self.browser_actions = []
+            self.wait = 0
 
     @property
     def encoding(self):

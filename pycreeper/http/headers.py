@@ -89,6 +89,14 @@ class Headers(CaselessDict):
             temp[key] = '; '.join(self.getlist(key))
         return temp
 
+    def get_cookies(self):
+        cookie_list = self.getlist('Cookie', [])
+        result = {}
+        for item in cookie_list:
+            item = item.split('=')
+            result[item[0].strip()] = item[1].strip()
+        return result
+
     def __copy__(self):
         return self.__class__(self)
 
