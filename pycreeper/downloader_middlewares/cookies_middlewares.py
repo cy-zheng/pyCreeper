@@ -25,25 +25,9 @@ class CookiesMiddleware(DownloaderMiddleware):
             return
         cookiejarkey = request.meta.get("cookiejar")
         jar = self.jars[cookiejarkey]
-        cookies = self._get_request_cookies(jar, request)
-        for cookie in cookies:
-            jar.set_cookie_if_ok(cookie, request)
-
         # set Cookie header
         request.headers.pop('Cookie', None)
         jar.add_cookie_header(request)
-
-    def _get_request_cookies(self, jar, request):
-        if isinstance(request.cookies, dict):
-            cookie_list = [{'name': k, 'value': v}
-                           for k, v in six.iteritems(request.cookies)]
-        else:
-            cookie_list = request.cookies
-        cookies = [self._format_cookie(x) for x in cookie_list]
-        headers = {'Set-Cookie': cookies}
-        response = Response(request.url, request, headers=headers)
-
-        return jar.make_cookies(response, request)
 
     def process_response(self, request, response):
         if request.meta.get('dont_merge_cookies', False):

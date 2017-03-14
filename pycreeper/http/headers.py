@@ -91,10 +91,13 @@ class Headers(CaselessDict):
 
     def get_cookies(self):
         cookie_list = self.getlist('Cookie', [])
-        result = {}
+        result = []
         for item in cookie_list:
+            cookie = {}
             item = item.split('=')
-            result[item[0].strip()] = item[1].strip()
+            cookie[u'name'] = item[0].strip().decode('utf-8')
+            cookie[u'value'] = item[1].strip().decode('utf-8')
+            result.append(cookie)
         return result
 
     def __copy__(self):

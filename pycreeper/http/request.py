@@ -10,24 +10,21 @@ from pycreeper.http.headers import Headers
 class Request(object):
     """ Request """
 
-    def __init__(self, url, callback=None, method='GET', headers=None,
-                 body=None, cookies=None, meta=None, encoding='utf-8',
-                 dont_filter=False, dynamic=False, browser_actions=[],
-                 wait=0):
+    def __init__(self, url, callback=None, method='GET',
+                 body=None, meta=None, encoding='utf-8',
+                 dynamic=False, browser_actions=None, wait=0):
         self._encoding = encoding
+        self.cookiejar = None
         self.url = url
         self.body = body
         self.method = str(method).upper()
         self.callback = callback
-        self.cookies = cookies or {}
-        self.headers = Headers(headers or {}, encoding=encoding)
-        self.dont_filter = dont_filter
         self.meta = dict(meta) if meta else {}
         self.dynamic = bool(dynamic)
         if self.dynamic:
             if self.method == 'POST':
                 raise AttributeError('Pycreeper can\'t make a dynamic POST request.')
-            self.browser_actions = browser_actions
+            self.browser_actions = browser_actions if browser_actions else []
             self.wait = int(wait)
         else:
             self.browser_actions = []
@@ -78,7 +75,7 @@ class Request(object):
     def copy(self, *args, **kwargs):
         """ copy """
         for key in ["encoding", "url", "method", "callback",
-                    "headers", "body", "cookies", "meta", "dont_filter"]:
+                    "cookiejar", "body", "meta"]:
             kwargs.setdefault(key, getattr(self, key))
         cls = kwargs.pop('cls', self.__class__)
         return cls(*args, **kwargs)

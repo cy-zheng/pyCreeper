@@ -8,9 +8,9 @@ from gevent import monkey
 monkey.patch_all()
 
 import logging
-
+from gevent.lock import BoundedSemaphore
 from gevent.pool import Pool
-
+from importlib import import_module
 from pycreeper.scheduler import Scheduler
 from pycreeper.downloader import Downloader
 from pycreeper.utils.gevent_wrapper import spawn, join_all
@@ -18,6 +18,7 @@ from pycreeper.utils import result2list
 from pycreeper.http.request import Request
 from Queue import Empty
 
+DRIVER_MODULE = 'selenium.webdriver'
 
 class Engine(object):
     """ Engine """
@@ -26,9 +27,18 @@ class Engine(object):
         self.spider = spider
         self.logger = spider.logger
         self.scheduler = Scheduler(spider)
-        self.downloader = Downloader(spider)
         self.settings = spider.settings
         max_request_size = self.settings["MAX_REQUEST_SIZE"]
+        self.dynamic = self.settings["DYNAMIC_CRAWL"]
+        if self.dynamic:
+            module_path = DRIVER_MODULE
+            module = import_module(module_path)
+            self.driver = getattr(module,
+                                  self.settings.get('DRIVER'))()
+        else:
+            self.driver = None
+        self.driver_sem = BoundedSemaphore(1)
+        self.downloader = Downloader(spider, self.driver, self.driver_sem)
         self.pool = Pool(size=max_request_size)
 
     def start(self):
@@ -62,6 +72,8 @@ class Engine(object):
                     self._process_request, request, spider)
             except Empty:
                 self.logger.info('All requests are finished, program exit...')
+                if self.driver:
+                    self.driver.close()
                 return
 
     def _process_request(self, request, spider):

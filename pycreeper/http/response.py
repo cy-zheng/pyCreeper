@@ -13,12 +13,12 @@ from pycreeper.http.request import Request
 class Response(object):
     """ Response """
 
-    def __init__(self, url, request, status=200, headers=None,
+    def __init__(self, url, request, status=200, cookiejar=None,
                  body='', encoding='utf-8'):
         self._encoding = encoding
         self.url = url
         self.status = int(status)
-        self.headers = Headers(headers or {})
+        self.cookiejar = cookiejar
         self.body = body
         self.request = request
 
@@ -75,7 +75,7 @@ class Response(object):
 
     def copy(self, *args, **kwargs):
         """ copy """
-        for key in ["url", "status", "headers", "body", "request", "encoding"]:
+        for key in ["url", "status", "cookiejar", "body", "request", "encoding"]:
             kwargs.setdefault(key, getattr(self, key))
 
         cls = kwargs.pop('cls', self.__class__)
