@@ -40,7 +40,10 @@ class DownloadHandler(object):
         self.logger.info("processing static page %s", url)
         kwargs = {
             "timeout": self.settings["TIMEOUT"],
+            "headers":request.headers,
         }
+        if "proxy" in request.meta and request.meta["proxy"]:
+            kwargs.update(proxies=request.meta["proxy"])
         try:
             session = requests.Session()
             if request.cookiejar:
@@ -55,8 +58,7 @@ class DownloadHandler(object):
                 raise ValueError('Unacceptable HTTP verb %s' % request.method)
         except Timeout as e:
             raise TimeoutException(e.message)
-        return Response(response.url, request, response.status_code,
-                        response.cookies, response.content)
+        return Response(response.url, request, status=response.status_code, cookiejar=response.cookies, body=response.content)
 
     def _fetch_dynamic(self, request, url):
         self.logger.info("processing dynamic page %s", url)

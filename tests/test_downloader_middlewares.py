@@ -2,13 +2,16 @@
 reload(__import__('sys')).setdefaultencoding('utf-8')
 __author__ = 'zcy'
 
+import time
 import unittest
-
+import json
 from pycreeper.downloader_middlewares import DownloaderMiddlewareManager
-from pycreeper.downloader_middlewares.middlewares import UserAgentMiddleware, RetryMiddleware
+from pycreeper.downloader_middlewares.middlewares import UserAgentMiddleware, RetryMiddleware, ProxyMiddleware
 from pycreeper.spider import Spider
 from pycreeper.http.request import Request
 from pycreeper.http.response import Response
+from pycreeper.downloader import DownloadHandler
+from gevent.lock import BoundedSemaphore
 
 
 class RetryMiddlewareTest(unittest.TestCase):
@@ -42,15 +45,48 @@ class UserAgentMiddlewareTest(unittest.TestCase):
         self.spider = Spider()
 
     def test_basic(self):
+        self.assertRaises(AttributeError, ProxyMiddleware,
+                          self.spider.settings, None)
+
+    def test_process_request(self):
+        self.spider.settings.set("PROXY_LIST", ['124.88.67.54:80'])
+        request = Request('http://httpbin.org/get')
+        pm = ProxyMiddleware(self.spider.settings, self.spider.logger)
+        dh = DownloadHandler(self.spider, None, BoundedSemaphore(1))
+        pm.process_request(request)
+        response = dh.fetch(request)
+        assert response.body
+
+    def test_process_request_interval(self):
+        self.spider.settings.set("PROXY_LIST", ['218.76.106.78:3128'])
+        request = Request('http://httpbin.org/get')
+        pm = ProxyMiddleware(self.spider.settings, self.spider.logger)
+        dh = DownloadHandler(self.spider, None, BoundedSemaphore(1))
+        pm.process_request(request)
+        time1 = time.time()
+        dh.fetch(request)
+
+        request = Request('http://httpbin.org/get')
+        pm.process_request(request)
+        self.assertGreater(time.time() - time1, 3)
+
+
+class ProxyMiddlewareTest(unittest.TestCase):
+    def setUp(self):
+        self.spider = Spider()
+
+    def test_basic(self):
         self.assertRaises(AttributeError, UserAgentMiddleware,
                           self.spider.settings, None)
 
     def test_process_request(self):
-        request = Request('http://httpbin.org/')
+        request = Request('http://httpbin.org/user-agent')
         self.assertIs(request.headers.get("User-Agent"), None)
         uam = UserAgentMiddleware(self.spider.settings, self.spider.logger)
+        dh = DownloadHandler(self.spider, None, BoundedSemaphore(1))
         uam.process_request(request)
-        self.assertIsInstance(request.headers.get("User-Agent"), str)
+        response = dh.fetch(request)
+        self.assertEqual(json.loads(response.body)['user-agent'], request.headers['User-Agent'])
 
 
 class DownloaderMiddlewareManagerTest(unittest.TestCase):

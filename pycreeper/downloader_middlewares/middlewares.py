@@ -9,12 +9,14 @@ from logging import Logger
 import chardet
 import gevent
 from pycreeper.downloader_middlewares import DownloaderMiddleware
+from pycreeper.utils.exceptions import TimeoutException
+from collections import deque
 
 
 class RetryMiddleware(DownloaderMiddleware):
     """ Retry Middleware """
 
-    RETRY_EXCEPTIONS = ()
+    RETRY_EXCEPTIONS = TimeoutException
 
     def __init__(self, settings, logger):
         self.max_retry_count = settings.get_int("RETRY_COUNT")
@@ -60,40 +62,45 @@ class UserAgentMiddleware(DownloaderMiddleware):
 
     def process_request(self, request):
         """process request
+
+        static requests only.
         """
-        request.headers["User-Agent"] = random.choice(self.user_agent_list)
+        if not request.dynamic:
+            request.headers["User-Agent"] = random.choice(self.user_agent_list)
 
 
 class ProxyMiddleware(DownloaderMiddleware):
     """ Proxy Middleware """
 
     def __init__(self, settings, logger):
-        self.host_time_map = {}
+        self.host_time_queue = deque()
         self.proxy_interval = settings["PROXY_INTERVAL"]
         self.proxy_list = settings["PROXY_LIST"]
-        self.proxy_enable = settings["PROXY_ENABLED"]
+        for proxy in self.proxy_list:
+            self.host_time_queue.append((proxy, 0))
         if not isinstance(logger, Logger):
             raise AttributeError('logger must be instance of logging.Logger')
         self.logger = logger
 
     def process_request(self, request):
         """process request
+
+        static requests only.
         """
-        if self.proxy_enable:
-            request.meta["proxy"] = self._get_proxy()
+        if not request.dynamic:
+            request.meta["proxy"] = {
+                "http": self._get_proxy(),
+            }
 
     def _get_proxy(self):
         """get proxy
         """
-        # TODO: 这段代码很容易长时间gevent.sleep。能否切换代理？
-        proxy = random.choice(self.proxy_list).strip()
-        host, _ = proxy.split(":")
-        latest = self.host_time_map.get(host, 0)
+        proxy, latest = self.host_time_queue.popleft()
         interval = time.time() - latest
         if interval < self.proxy_interval:
             self.logger.info("Proxy %s waitting ...", proxy)
-            gevent.sleep(self.proxy_interval)
-        self.host_time_map[host] = time.time()
+            gevent.sleep(self.proxy_interval - interval)
+        self.host_time_queue.append((proxy, time.time()))
         return "http://%s" % proxy
 
 

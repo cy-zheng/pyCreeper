@@ -9,7 +9,6 @@ from w3lib.url import safe_url_string
 from pycreeper.http.request import Request
 
 
-
 class RequestTest(unittest.TestCase):
     def test_init(self):
         self.assertRaises(Exception, Request)
@@ -23,7 +22,6 @@ class RequestTest(unittest.TestCase):
                                    },
                           method='get'
                           )
-        self.assertIsInstance(request.headers, Headers)
         self.assertEqual(request.method, 'GET')
 
     def test_copy(self):

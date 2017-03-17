@@ -4,15 +4,17 @@ __author__ = 'zcy'
 
 import six
 from w3lib.url import safe_url_string
+import copy
 
 
 class Request(object):
     """ Request """
 
-    def __init__(self, url, callback=None, method='GET',
+    def __init__(self, url, callback=None, method='GET', headers=None,
                  body=None, meta=None, encoding='utf-8', cookiejar=None,
                  dynamic=False, browser_actions=None, wait=0):
         self._encoding = encoding
+        self.headers = copy.deepcopy(headers) if headers else {}
         self.cookiejar = cookiejar
         self.url = url
         self.body = body
@@ -74,7 +76,7 @@ class Request(object):
     def copy(self, *args, **kwargs):
         """ copy """
         for key in ["encoding", "url", "method", "callback",
-                    "cookiejar", "body", "meta"]:
+                    "cookiejar", "body", "meta", "headers"]:
             kwargs.setdefault(key, getattr(self, key))
         cls = kwargs.pop('cls', self.__class__)
         return cls(*args, **kwargs)

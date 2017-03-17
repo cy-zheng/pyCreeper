@@ -3,11 +3,11 @@ reload(__import__('sys')).setdefaultencoding('utf-8')
 __author__ = 'zcy'
 
 import unittest
-
+import time
 from pycreeper.scheduler import RequestFilter, Scheduler
 from pycreeper.http.request import Request
-from pycreeper.utils.log import get_logger
-from pycreeper.conf.settings import Settings
+from pycreeper.spider import Spider
+from Queue import Empty
 
 __doctests__ = ['pycreeper.utils.scheduler']
 
@@ -34,14 +34,17 @@ class RequestTest(unittest.TestCase):
         self.assertEqual(request_filter.request_seen(REQUEST[1]), True)
         self.assertRaises(AttributeError, request_filter.request_seen, None)
 
+
 class SchedulerTest(unittest.TestCase):
+
+    def setUp(self):
+        self.spider = Spider()
 
     def test_basic(self):
         self.assertRaises(AttributeError, Scheduler, None)
 
     def test_enqueue(self):
-        logger = get_logger(Settings())
-        scheduler = Scheduler(logger)
+        scheduler = Scheduler(self.spider)
         self.assertRaises(AttributeError, scheduler.enqueue_request, None)
         self.assertEqual(len(scheduler.queue), 0)
         scheduler.enqueue_request(REQUEST[0])
@@ -53,17 +56,24 @@ class SchedulerTest(unittest.TestCase):
         scheduler.enqueue_request(REQUEST[0])
         self.assertEqual(len(scheduler.queue), 2)
 
-    def test_enqueue(self):
-        logger = get_logger(Settings())
-        scheduler = Scheduler(logger)
-        self.assertIs(scheduler.next_request(), None)
+    def test_next_request(self):
+        scheduler = Scheduler(self.spider)
+        self.assertRaises(Empty, scheduler.next_request)
         scheduler.enqueue_request(REQUEST[0])
         scheduler.enqueue_request(REQUEST[1])
         scheduler.enqueue_request(REQUEST[2])
         self.assertEqual(scheduler.next_request(), REQUEST[0])
         self.assertEqual(scheduler.next_request(), REQUEST[1])
         self.assertEqual(scheduler.next_request(), REQUEST[2])
-        self.assertIs(scheduler.next_request(), None)
+        self.assertRaises(Empty, scheduler.next_request)
+
+    def test_download_delay(self):
+        self.spider.settings.set('DOWNLOAD_DELAY', 5)
+        scheduler = Scheduler(self.spider)
+        scheduler.enqueue_request(REQUEST[0])
+        time1 = time.time()
+        scheduler.next_request()
+        self.assertGreater(time.time() - time1, 5)
 
 
 if __name__ == "__main__":

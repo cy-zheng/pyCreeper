@@ -42,7 +42,6 @@ class ResponseTest(unittest.TestCase):
                                      'Content-Length': 1234
                                      }
                             )
-        self.assertIsInstance(response.headers, Headers)
 
     def test_copy(self):
         response1 = Response('http://www.example.com/',
