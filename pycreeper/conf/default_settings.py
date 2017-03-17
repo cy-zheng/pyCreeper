@@ -18,11 +18,8 @@ DEFAULT_HEADERS = {
     'Accept-Language': 'zh-CN,zh;q=0.8,en;q=0.6',
 }
 
-MAX_REQUEST_SIZE = 30
+MAX_REQUEST_SIZE = 20
 
-PROXY_ENABLED = False
-PROXY_INTERVAL = 5
-PROXY_LIST = []
 
 MAX_REDIRECT_COUNT = 10
 
@@ -57,8 +54,8 @@ USER_AGENT_LIST = [
 
 DOWNLOADER_MIDDLEWARES = {}
 
-"dynamic crawl"
-
 DYNAMIC_CRAWL = True
 
 DRIVER = 'Firefox'
+
+DRIVER_INIT_KWARGS = {}

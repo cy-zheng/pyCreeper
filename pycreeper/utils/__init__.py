@@ -79,3 +79,12 @@ def to_native_str(text, encoding=None, errors='strict'):
         return to_bytes(text, encoding, errors)
     else:
         return to_unicode(text, encoding, errors)
+
+
+def _get_cookies_from_cookiejar(cj):
+    result = []
+    for domain in cj._cookies.keys():
+        for path in cj._cookies[domain].keys():
+            for cookie in cj._cookies[domain][path].values():
+                result.append(cookie)
+    return result

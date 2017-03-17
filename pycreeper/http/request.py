@@ -4,17 +4,16 @@ __author__ = 'zcy'
 
 import six
 from w3lib.url import safe_url_string
-from pycreeper.http.headers import Headers
 
 
 class Request(object):
     """ Request """
 
     def __init__(self, url, callback=None, method='GET',
-                 body=None, meta=None, encoding='utf-8',
+                 body=None, meta=None, encoding='utf-8', cookiejar=None,
                  dynamic=False, browser_actions=None, wait=0):
         self._encoding = encoding
-        self.cookiejar = None
+        self.cookiejar = cookiejar
         self.url = url
         self.body = body
         self.method = str(method).upper()

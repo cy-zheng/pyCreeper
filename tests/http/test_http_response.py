@@ -8,7 +8,6 @@ from w3lib.url import safe_url_string
 
 from pycreeper.http.request import Request
 from pycreeper.http.response import Response
-from pycreeper.http.headers import Headers
 
 
 class ResponseTest(unittest.TestCase):

@@ -33,8 +33,9 @@ class Engine(object):
         if self.dynamic:
             module_path = DRIVER_MODULE
             module = import_module(module_path)
+            init_kwargs = self.settings['DRIVER_INIT_KWARGS']
             self.driver = getattr(module,
-                                  self.settings.get('DRIVER'))()
+                                  self.settings.get('DRIVER'))(**init_kwargs)
         else:
             self.driver = None
         self.driver_sem = BoundedSemaphore(1)

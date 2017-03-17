@@ -11,8 +11,8 @@ from selenium.common.exceptions import TimeoutException as _TimeoutException
 from pycreeper.utils.exceptions import TimeoutException
 from requests.exceptions import Timeout
 import six
-from pycreeper.http.headers import Headers
-from urlparse import urlparse
+from pycreeper.utils import _get_cookies_from_cookiejar
+import gevent
 
 
 class DownloadHandler(object):
@@ -30,21 +30,14 @@ class DownloadHandler(object):
         """fetch
         """
         # TODO: 应该把proxy拿出去做成一个中间件
-        '''
-        proxy = request.meta.get("proxy")
-        if proxy:
-            kwargs["proxies"] = {"http:": proxy}
-            self.logger.info("Use proxy %s", proxy)
-        kwargs.update(self.kwargs)
-        '''
         url = request.url
-        self.logger.info("processing %s", url)
         if request.dynamic:
             return self._fetch_dynamic(request, url)
         else:
             return self._fetch_static(request, url)
 
     def _fetch_static(self, request, url):
+        self.logger.info("processing static page %s", url)
         kwargs = {
             "timeout": self.settings["TIMEOUT"],
         }
@@ -60,24 +53,17 @@ class DownloadHandler(object):
                 response = session.post(url, **kwargs)
             else:
                 raise ValueError('Unacceptable HTTP verb %s' % request.method)
-            # TODO: 把response的cookiejar放到request里面应该是middleware做的工作
-            '''
-            # handle cookie in response
-            if request.cookiejar:
-                cookies = self._get_cookies_from_cookiejar(response.cookies)
-                for cookie in cookies:
-                    request.cookiejar.set_cookie(cookie)
-            '''
         except Timeout as e:
             raise TimeoutException(e.message)
         return Response(response.url, request, response.status_code,
                         response.cookies, response.content)
 
     def _fetch_dynamic(self, request, url):
+        self.logger.info("processing dynamic page %s", url)
         try:
             self.driver_sem.acquire()
             if request.cookiejar:
-                cookies = self._get_cookies_from_cookiejar(request.cookiejar)
+                cookies = _get_cookies_from_cookiejar(request.cookiejar)
                 cookies = self._covert_cookies_to_dict(cookies)
                 #self._removed_first_dot_in_front_of_domain(cookies)
                 command_list = self._get_command_list(cookies)
@@ -88,8 +74,8 @@ class DownloadHandler(object):
                     self.driver.execute_script(command)
 
             self.driver.set_page_load_timeout(self.settings["TIMEOUT"])
-            self.driver.implicitly_wait(request.wait)
             self.driver.get(url)
+            gevent.sleep(request.wait)
             for func in request.browser_actions:
                 func(self.driver)
             html = self.driver.page_source
@@ -126,14 +112,6 @@ class DownloadHandler(object):
             js_list.append("document.cookie = '%s';\n" % ('; '.join(item_list)))
         return js_list
 
-    def _get_cookies_from_cookiejar(self, cj):
-        result = []
-        for domain in cj._cookies.keys():
-            for path in cj._cookies[domain].keys():
-                for cookie in cj._cookies[domain][path].values():
-                    result.append(cookie)
-        return result
-
     def _make_cookie(self, **kwargs):
         return cookielib.Cookie(
             version=0,
@@ -158,7 +136,7 @@ class DownloadHandler(object):
         result = []
         for cookie in cookies:
             cookie_dict = {}
-            for key in ['name', 'value', 'domain', 'path', 'expiry']:
+            for key in ['name', 'value', 'domain', 'path', 'expires']:
                 if getattr(cookie, key):
                     cookie_dict[key] = getattr(cookie, key)
             result.append(cookie_dict)

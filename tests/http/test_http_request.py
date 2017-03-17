@@ -7,7 +7,7 @@ import unittest
 from w3lib.url import safe_url_string
 
 from pycreeper.http.request import Request
-from pycreeper.http.headers import Headers
+
 
 
 class RequestTest(unittest.TestCase):
