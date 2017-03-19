@@ -2,13 +2,13 @@
 PyCreeper是一个用来快速提取网页内容的信息采集（爬虫）框架。项目底层异步网络I/O使用 **Gevent** 协程库，将网络请求分为静态请求和动态请求，
 静态请求交给 **Requests** 处理，动态请求则使用 **Selenium.Webdriver** 加载。
 
-在设计这个项目的过程中，我参考了很多 **Scrapy** （项目网站: https://scrapy.org/）的架构和实现方式。Scrapy是一个非常棒的爬虫框架，
+在设计这个项目的过程中，我参考了很多[Scrapy](https://scrapy.org/)的架构和实现方式。Scrapy是一个非常棒的爬虫框架，
 我之前花了很多心血在Scrapy框架之上！
 
 这篇PyCreeper初探会编写一个简单的爬虫例子，让您明白PyCreeper大致的工作流程，使您快速上手。
 
 ## 目标任务
-知乎（https://www.zhihu.com/）与Quora类似，是一个分享知识提出问题的平台。我们的Demo任务是模拟登陆知乎，保存Cookie，
+[知乎](https://www.zhihu.com/)与Quora类似，是一个分享知识提出问题的平台。我们的Demo任务是模拟登陆知乎，保存Cookie，
 之后发出一系列静态请求，获取首页的问题题目与描述。
 
 由于模拟登陆一步我们采用了基于Selenium.Webdriver的动态请求处理，所以你可以抛开复杂的抓包与分析代码，只需要点几个按钮，
@@ -206,8 +206,7 @@ pip install pycreeper
 
 未来我们将会引入Docker的支持。
 
-目前项目刚刚发布1.0.0版本，如果在使用时，遇到各种问题，我们都欢迎您反馈给我们，您可以通过github，
-项目主页：https://github.com/ZcyAndWt/pyCreeper，也可以通过邮件，作者的邮箱：zhengchenyu.backend@gmail.com。
+目前项目刚刚发布1.0.0版本，如果在使用时，遇到各种问题，我们都欢迎您反馈给我们，您可以通过github[项目主页](https://github.com/ZcyAndWt/pyCreeper)，也可以通过邮件，作者的邮箱：zhengchenyu.backend@gmail.com。
 
 如果您使用中，觉得本项目有可取之处，提高了您爬取数据的效率，希望您能在github上star本项目。
 您的支持是我们前进最大的动力！
