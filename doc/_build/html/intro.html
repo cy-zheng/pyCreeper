@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PyCreeper初探 &#8212; PyCreeper 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="&lt;no title&gt;" href="tutorial.html" />
+    <link rel="prev" title="PyCreeper: 抓取你能看到的一切！" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pycreeper">
+<h1>PyCreeper初探<a class="headerlink" href="#pycreeper" title="Permalink to this headline">¶</a></h1>
+<p>PyCreeper是一个用来快速提取网页内容的信息采集（爬虫）框架。项目底层异步网络I/O使用 <strong>Gevent</strong> 协程库，将网络请求分为静态请求和动态请求，
+静态请求交给 <strong>Requests</strong> 处理，动态请求则使用 <strong>Selenium.Webdriver</strong> 加载。</p>
+<p>在设计这个项目的过程中，我参考了很多 <strong>Scrapy</strong> （项目网站: <a class="reference external" href="https://scrapy.org/">https://scrapy.org/</a>）的架构和实现方式。Scrapy是一个非常棒的爬虫框架，
+我之前花了很多心血在Scrapy框架之上！</p>
+<p>这篇PyCreeper初探会编写一个简单的爬虫例子，让您明白PyCreeper大致的工作流程，使您快速上手。</p>
+<div class="section" id="id1">
+<h2>目标任务<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>知乎（<a class="reference external" href="https://www.zhihu.com/">https://www.zhihu.com/</a>）与Quora类似，是一个分享知识提出问题的平台。我们的Demo任务是模拟登陆知乎，保存Cookie，
+之后发出一系列静态请求，获取首页的问题题目与描述。</p>
+<p>由于模拟登陆一步我们采用了基于Selenium.Webdriver的动态请求处理，所以你可以抛开复杂的抓包与分析代码，只需要点几个按钮，
+就像在真实环境登录知乎一样简单便利！</p>
+</div>
+<div class="section" id="id2">
+<h2>定义一个爬虫<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>定义一个爬虫类需要需要继承Spider类，代码如下:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pycreeper.spider</span> <span class="k">import</span> <span class="n">Spider</span>
+
+<span class="k">class</span> <span class="nc">Zhihu_Spider</span><span class="p">(</span><span class="n">Spider</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="middlewares">
+<h2>选择中间件MiddleWares<a class="headerlink" href="#middlewares" title="Permalink to this headline">¶</a></h2>
+<p>对于Spider的中间件选择，通过修改custom_settings对象实现:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">custom_settings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;DOWNLOADER_MIDDLEWARES&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;pycreeper.downloader_middlewares.middlewares.UserAgentMiddleware&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="s1">&#39;pycreeper.downloader_middlewares.middlewares.RetryMiddleware&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+        <span class="s1">&#39;pycreeper.downloader_middlewares.cookies_middlewares.CookiesMiddleware&#39;</span><span class="p">:</span> <span class="mi">300</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;DRIVER&#39;</span><span class="p">:</span> <span class="s1">&#39;Chrome&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;DOWNLOAD_DELAY&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;USER_AGENT_LIST&#39;</span><span class="p">:</span> <span class="p">[</span>
+       <span class="sd">&#39;&#39;&#39;Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36</span>
+<span class="sd">        (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36&#39;&#39;&#39;</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>其中，DOWNLOADER_MIDDLEWARES是这个爬虫爬取过程中使用的中间件。UserAgentMiddleware提供了一种简单的控制请求User-Agent的方式（只对静态请求有效，
+动态请求的UA取决于使用的WebDriver）。RetryMiddleware对失败的请求（错误的返回码，超时等）进行多次重试。CookiesMiddleware在全体的请求之间共享CookieJar池，
+一组请求可以共享一个CookieJar，CookiesMiddleware维护CookieJar的有效性与一致性。</p>
+<p>DRIVER表明了动态请求的浏览器，这里我们使用Chrome。</p>
+<p>DOWNLOAD_DELAY表明了下载之间的延迟时间（秒），这个选项当网站有某种防爬策略时还是很有用的。</p>
+<p>USER_AGENT_LIST中包含请求使用的User-Agent，UserAgentMiddleware会从中随机取出一个来使用。</p>
+</div>
+<div class="section" id="id3">
+<h2>最开始的请求<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>下面这段代码通过重写start_requests方法yield一个PyCreeper请求:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">_login</span><span class="p">(</span><span class="n">driver</span><span class="p">):</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s1">&#39;account&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">)</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s1">&#39;/html/body/div[1]/div/div[2]/div[2]/form/div[2]/button&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+        <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;https://www.zhihu.com/#signin&#39;</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cookiejar&quot;</span><span class="p">:</span> <span class="s2">&quot;zhihu&quot;</span><span class="p">},</span>
+                  <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">after_login</span><span class="p">,</span> <span class="n">dynamic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">browser_actions</span><span class="o">=</span><span class="p">[</span><span class="n">_login</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>在Request对象的参数中，dynamic=True表明这是一个动态请求，将会调用WebDriver加载，
+而browser_actions=[_login]则定义了浏览器加载完成之后进行的动作。本例中输入了用户名与密码，然后点击登录。
+gevent.sleep(5)则是令爬虫等待浏览器加载完成。</p>
+<p>meta={&#8220;cookiejar&#8221;: &#8220;zhihu&#8221;}这个选项表明本次请求产生的Cookie将会被存储在名为zhihu的CookieJar当中</p>
+<p>callback=self.after_login定义了本次响应的处理函数。</p>
+</div>
+<div class="section" id="id4">
+<h2>接下来？<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>接下来一步将在知乎首页中提取问题链接，发出静态问题请求:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">after_login</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+    <span class="n">html</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">body</span>
+    <span class="n">selector</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+    <span class="n">links</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s1">&#39;//a[@class=&quot;question_link&quot;]&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">links</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="s1">&#39;https://www.zhihu.com&#39;</span> <span class="o">+</span> <span class="n">link</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;href&quot;</span><span class="p">],</span>
+                      <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cookiejar&quot;</span><span class="p">:</span> <span class="s2">&quot;zhihu&quot;</span><span class="p">},</span> <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>response.body存储了响应的内容。我们使用了lxml提取html文本中的标签，然后发出一系列静态请求。</p>
+<p>在获得问题页面的数据之后，我们需要做的是提取出其中的问题标题与详情:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+    <span class="n">html</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">body</span>
+    <span class="n">selector</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s1">&#39;//h1[@class=&quot;QuestionHeader-title&quot;]&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s1">&#39;//span[@class=&quot;RichText&quot;]&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
+    <span class="k">yield</span> <span class="p">{</span>
+        <span class="s1">&#39;head&#39;</span><span class="p">:</span> <span class="n">head</span><span class="p">,</span>
+        <span class="s1">&#39;body&#39;</span><span class="p">:</span> <span class="n">body</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>过程与上个函数类似，通过xpath定位元素。</p>
+</div>
+<div class="section" id="id5">
+<h2>处理你获得的数据<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<p>处理数据通过重写process_item方法实现:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+    <span class="nb">print</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>这里我们只是将结果打印。</p>
+</div>
+<div class="section" id="id6">
+<h2>运行你的爬虫<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<p>最后我们通过这样一段代码运行爬虫:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">spider</span> <span class="o">=</span> <span class="n">Zhihu_Spider</span><span class="p">()</span>
+    <span class="n">spider</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>完整的代码如下:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># -*- coding:utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">pycreeper.spider</span> <span class="k">import</span> <span class="n">Spider</span>
+<span class="kn">from</span> <span class="nn">pycreeper.http.request</span> <span class="k">import</span> <span class="n">Request</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">gevent</span>
+
+
+<span class="k">class</span> <span class="nc">Zhihu_Spider</span><span class="p">(</span><span class="n">Spider</span><span class="p">):</span>
+
+    <span class="n">custom_settings</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;DOWNLOADER_MIDDLEWARES&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;pycreeper.downloader_middlewares.middlewares.UserAgentMiddleware&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="s1">&#39;pycreeper.downloader_middlewares.middlewares.RetryMiddleware&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+            <span class="s1">&#39;pycreeper.downloader_middlewares.cookies_middlewares.CookiesMiddleware&#39;</span><span class="p">:</span> <span class="mi">300</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;DRIVER&#39;</span><span class="p">:</span> <span class="s1">&#39;Chrome&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;DOWNLOAD_DELAY&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s1">&#39;STATIC_REQUEST_SSL_VERIFY&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s1">&#39;USER_AGENT_LIST&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="sd">&#39;&#39;&#39;Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36</span>
+<span class="sd">            (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36&#39;&#39;&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">_login</span><span class="p">(</span><span class="n">driver</span><span class="p">):</span>
+            <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s1">&#39;account&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s2">&quot;15501277123&quot;</span><span class="p">)</span>
+            <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s2">&quot;zcymichael&quot;</span><span class="p">)</span>
+            <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s1">&#39;/html/body/div[1]/div/div[2]/div[2]/form/div[2]/button&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+            <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+        <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;https://www.zhihu.com/#signin&#39;</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cookiejar&quot;</span><span class="p">:</span> <span class="s2">&quot;zhihu&quot;</span><span class="p">},</span>
+                      <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">after_login</span><span class="p">,</span> <span class="n">dynamic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">browser_actions</span><span class="o">=</span><span class="p">[</span><span class="n">_login</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">after_login</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">body</span>
+        <span class="n">selector</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+        <span class="n">links</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s1">&#39;//a[@class=&quot;question_link&quot;]&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">links</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="s1">&#39;https://www.zhihu.com&#39;</span> <span class="o">+</span> <span class="n">link</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;href&quot;</span><span class="p">],</span>
+                          <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cookiejar&quot;</span><span class="p">:</span> <span class="s2">&quot;zhihu&quot;</span><span class="p">},</span> <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">body</span>
+        <span class="n">selector</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s1">&#39;//h1[@class=&quot;QuestionHeader-title&quot;]&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s1">&#39;//span[@class=&quot;RichText&quot;]&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">yield</span> <span class="p">{</span>
+            <span class="s1">&#39;head&#39;</span><span class="p">:</span> <span class="n">head</span><span class="p">,</span>
+            <span class="s1">&#39;body&#39;</span><span class="p">:</span> <span class="n">body</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="nb">print</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">spider</span> <span class="o">=</span> <span class="n">Zhihu_Spider</span><span class="p">()</span>
+    <span class="n">spider</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id7">
+<h2>写在后面<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<p>项目已经通过PyPi发布，您可以通过以下命令下载:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pycreeper</span>
+</pre></div>
+</div>
+<p>未来我们将会引入Docker的支持。</p>
+<p>目前项目刚刚发布1.0.0版本，如果在使用时，遇到各种问题，我们都欢迎您反馈给我们，您可以通过github，
+项目主页：<a class="reference external" href="https://github.com/ZcyAndWt/pyCreeper">https://github.com/ZcyAndWt/pyCreeper</a>，也可以通过邮件，作者的邮箱：<a class="reference external" href="mailto:zhengchenyu&#46;backend&#37;&#52;&#48;gmail&#46;com">zhengchenyu<span>&#46;</span>backend<span>&#64;</span>gmail<span>&#46;</span>com</a>。</p>
+<p>如果您使用中，觉得本项目有可取之处，提高了您爬取数据的速度，希望您能在github上star本项目。
+您的支持是我们前进最大的动力！</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">PyCreeper初探</a><ul>
+<li><a class="reference internal" href="#id1">目标任务</a></li>
+<li><a class="reference internal" href="#id2">定义一个爬虫</a></li>
+<li><a class="reference internal" href="#middlewares">选择中间件MiddleWares</a></li>
+<li><a class="reference internal" href="#id3">最开始的请求</a></li>
+<li><a class="reference internal" href="#id4">接下来？</a></li>
+<li><a class="reference internal" href="#id5">处理你获得的数据</a></li>
+<li><a class="reference internal" href="#id6">运行你的爬虫</a></li>
+<li><a class="reference internal" href="#id7">写在后面</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">PyCreeper: 抓取你能看到的一切！</a></li>
+      <li>Next: <a href="tutorial.html" title="next chapter">&lt;no title&gt;</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/intro.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Jim Zheng.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/intro.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
