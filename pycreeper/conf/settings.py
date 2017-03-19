@@ -33,9 +33,10 @@ class Settings(object):
         """
         if isinstance(module, basestring):
             module = import_module(module)
-        for key in dir(module):
+        for key in module if isinstance(module, dict) else dir(module):
             if key.isupper():
-                self.set(key, getattr(module, key))
+                self.set(key, module.get(key) \
+                    if isinstance(module, dict) else getattr(module, key))
 
     def set(self, key, value):
         """set

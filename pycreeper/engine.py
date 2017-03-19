@@ -35,7 +35,7 @@ class Engine(object):
             module = import_module(module_path)
             init_kwargs = self.settings['DRIVER_INIT_KWARGS']
             self.driver = getattr(module,
-                                  self.settings.get('DRIVER'))(**init_kwargs)
+                                  self.settings.get('DRIVER').title())(**init_kwargs)
         else:
             self.driver = None
         self.driver_sem = BoundedSemaphore(1)
@@ -95,7 +95,7 @@ class Engine(object):
 
         """
         response = self.downloader.fetch(request, spider)
-        response.request = request
+        #response.request = request
         return response
 
     def _handle_downloader_output(self, response, request, spider):

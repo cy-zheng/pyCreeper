@@ -13,6 +13,7 @@ from requests.exceptions import Timeout
 import six
 from pycreeper.utils import _get_cookies_from_cookiejar
 import gevent
+import traceback
 
 
 class DownloadHandler(object):
@@ -29,7 +30,6 @@ class DownloadHandler(object):
     def fetch(self, request):
         """fetch
         """
-        # TODO: 应该把proxy拿出去做成一个中间件
         url = request.url
         if request.dynamic:
             return self._fetch_dynamic(request, url)
@@ -40,7 +40,8 @@ class DownloadHandler(object):
         self.logger.info("processing static page %s", url)
         kwargs = {
             "timeout": self.settings["TIMEOUT"],
-            "headers":request.headers,
+            "headers": request.headers,
+            "verify": self.settings["STATIC_REQUEST_SSL_VERIFY"],
         }
         if "proxy" in request.meta and request.meta["proxy"]:
             kwargs.update(proxies=request.meta["proxy"])
@@ -56,9 +57,14 @@ class DownloadHandler(object):
                 response = session.post(url, **kwargs)
             else:
                 raise ValueError('Unacceptable HTTP verb %s' % request.method)
+            return Response(response.url, request, status=response.status_code,
+                            cookiejar=response.cookies, body=response.content)
         except Timeout as e:
             raise TimeoutException(e.message)
-        return Response(response.url, request, status=response.status_code, cookiejar=response.cookies, body=response.content)
+        except Exception as e:
+            self.logger.error("download error: %s", str(e), exc_info=True)
+            raise e
+
 
     def _fetch_dynamic(self, request, url):
         self.logger.info("processing dynamic page %s", url)
@@ -97,6 +103,9 @@ class DownloadHandler(object):
             return Response(url, request, cookiejar=cj, body=html)
         except _TimeoutException as e:
             raise TimeoutException(e.message)
+        except Exception as e:
+            self.logger.error("download error: %s", str(e), exc_info=True)
+            raise e
 
     def _removed_first_dot_in_front_of_domain(self, cookies):
         for cookie in cookies:
