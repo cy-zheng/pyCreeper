@@ -154,8 +154,8 @@ response.body存储了响应的内容。我们使用了lxml提取html文本中�
         def start_requests(self):
 
             def _login(driver):
-                driver.find_element_by_name('account').send_keys("15501277123")
-                driver.find_element_by_name('password').send_keys("zcymichael")
+                driver.find_element_by_name('account').send_keys("username")
+                driver.find_element_by_name('password').send_keys("password")
                 driver.find_element_by_xpath('/html/body/div[1]/div/div[2]/div[2]/form/div[2]/button').click()
                 gevent.sleep(5)
 

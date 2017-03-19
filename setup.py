@@ -2,14 +2,14 @@ from setuptools import setup, find_packages
 
 setup(
     name="pycreeper",
-    version="0.0.2",
+    version="1.0.0",
     description='''Creepers feel like a web crawler:
                     slow growth and and wide coverage.''',
     author="zcy",
     author_email="zhengchenyu.backend@gmail.com",
     url="https://github.com/ZcyAndWt/pyCreeper",
     license="LGPL",
-    packages=find_packages(exclude=('tests', 'tests.*', 'examples', 'examples.*')),
+    packages=find_packages(exclude=('doc', 'doc.*', 'tests', 'tests.*', 'examples', 'examples.*')),
     install_requires=[
         'gevent>=1.2.1',
         'importlib>=1.0.4',
@@ -18,5 +18,6 @@ setup(
         'w3lib>=1.16.0',
         'six>=1.9.0',
         'pybloom>=1.1',
+        'selenium>=2.48.0'
     ],
     )
