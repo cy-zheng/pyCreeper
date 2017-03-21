@@ -12,17 +12,7 @@ RETRY_STATUS_CODES = [500, 502, 503, 504, 400, 403, 408]
 
 TIMEOUT = 5
 
-DEFAULT_HEADERS = {
-    'Accept': 'text/html,application/xhtml+xml,application/xml;'
-              'q=0.9,image/webp,*/*;q=0.8',
-    'Accept-Language': 'zh-CN,zh;q=0.8,en;q=0.6',
-}
-
 MAX_REQUEST_SIZE = 20
-
-
-MAX_REDIRECT_COUNT = 10
-
 
 USER_AGENT_LIST = [
     'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31',

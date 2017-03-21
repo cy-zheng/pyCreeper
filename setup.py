@@ -3,13 +3,13 @@ from setuptools import setup, find_packages
 setup(
     name="pycreeper",
     version="1.0.0",
-    description='''Creepers feel like a web crawler:
-                    slow growth and and wide coverage.''',
+    description='''A web crawler that is able to crawl dynamic web page.''',
     author="zcy",
     author_email="zhengchenyu.backend@gmail.com",
     url="https://github.com/ZcyAndWt/pyCreeper",
     license="LGPL",
-    packages=find_packages(exclude=('doc', 'doc.*', 'tests', 'tests.*', 'examples', 'examples.*')),
+    packages=find_packages(exclude=('doc', 'doc.*', 'tests',
+                                    'tests.*', 'examples', 'examples.*')),
     install_requires=[
         'gevent>=1.2.1',
         'importlib>=1.0.4',

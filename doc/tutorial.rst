@@ -8,6 +8,8 @@ PyCreeper是一个用来快速提取网页内容的信息采集（爬虫）框�
 
 这篇PyCreeper初探会编写一个简单的爬虫例子，让您明白PyCreeper大致的工作流程，使您快速上手。
 
+如果您的PyCreeper还没有安装好，请参考： :doc:`prepare`。
+
 目标任务
 ---------
 知乎（https://www.zhihu.com/）与Quora类似，是一个分享知识提出问题的平台。我们的Demo任务是模拟登陆知乎，保存Cookie，

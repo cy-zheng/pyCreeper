@@ -1,6 +1,7 @@
 使用前的准备
 ==============
 我们假定您已经安装了Python2.7及以上版本，若没有安装，请参考Python官网（https://www.python.org/）选择合适的版本进行安装。
+
 PyCreeper对于以下几个库存在依赖关系：
 
  * gevent

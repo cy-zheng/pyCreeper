@@ -8,7 +8,7 @@
     
     <title>PyCreeper初探 &#8212; PyCreeper 1.0.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -27,16 +27,24 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="使用前的准备" href="prepare.html" />
-    <link rel="prev" title="PyCreeper: 抓取你能看到的一切！" href="index.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="prev" title="PyCreeper: 抓取你能看到的一切！" href="index.html" /> 
   </head>
   <body role="document">
-  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="prepare.html" title="使用前的准备"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="PyCreeper: 抓取你能看到的一切！"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PyCreeper 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -50,6 +58,7 @@
 <p>在设计这个项目的过程中，我参考了很多 <strong>Scrapy</strong> （项目网站: <a class="reference external" href="https://scrapy.org/">https://scrapy.org/</a>）的架构和实现方式。Scrapy是一个非常棒的爬虫框架，
 我之前花了很多心血在Scrapy框架之上！</p>
 <p>这篇PyCreeper初探会编写一个简单的爬虫例子，让您明白PyCreeper大致的工作流程，使您快速上手。</p>
+<p>如果您的PyCreeper还没有安装好，请参考： <a class="reference internal" href="prepare.html"><span class="doc">使用前的准备</span></a>。</p>
 <div class="section" id="id1">
 <h2>目标任务<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>知乎（<a class="reference external" href="https://www.zhihu.com/">https://www.zhihu.com/</a>）与Quora类似，是一个分享知识提出问题的平台。我们的Demo任务是模拟登陆知乎，保存Cookie，
@@ -187,8 +196,8 @@ gevent.sleep(5)则是令爬虫等待浏览器加载完成。</p>
     <span class="k">def</span> <span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="k">def</span> <span class="nf">_login</span><span class="p">(</span><span class="n">driver</span><span class="p">):</span>
-            <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s1">&#39;account&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s2">&quot;15501277123&quot;</span><span class="p">)</span>
-            <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s2">&quot;zcymichael&quot;</span><span class="p">)</span>
+            <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s1">&#39;account&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span>
+            <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">)</span>
             <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s1">&#39;/html/body/div[1]/div/div[2]/div[2]/form/div[2]/button&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
             <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 
@@ -256,15 +265,13 @@ gevent.sleep(5)则是令爬虫等待浏览器加载完成。</p>
 </ul>
 </li>
 </ul>
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">PyCreeper: 抓取你能看到的一切！</a></li>
-      <li>Next: <a href="prepare.html" title="next chapter">使用前的准备</a></li>
-  </ul></li>
-</ul>
-</div>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">PyCreeper: 抓取你能看到的一切！</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="prepare.html"
+                        title="next chapter">使用前的准备</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -286,20 +293,24 @@ gevent.sleep(5)则是令爬虫等待浏览器加载完成。</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2017, Jim Zheng.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-      |
-      <a href="_sources/tutorial.rst.txt"
-          rel="nofollow">Page source</a>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="prepare.html" title="使用前的准备"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="PyCreeper: 抓取你能看到的一切！"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PyCreeper 1.0.0 documentation</a> &#187;</li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Jim Zheng.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
   </body>
 </html>

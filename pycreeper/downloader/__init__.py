@@ -86,6 +86,7 @@ class DownloadHandler(object):
             gevent.sleep(request.wait)
             for func in request.browser_actions:
                 func(self.driver)
+            url = self.driver.current_url
             html = self.driver.page_source
 
             # generate cookies
