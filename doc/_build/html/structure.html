@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>架构概览 &#8212; PyCreeper 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="settings：项目设置" href="ssettings.html" />
+    <link rel="prev" title="使用前的准备" href="prepare.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ssettings.html" title="settings：项目设置"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="prepare.html" title="使用前的准备"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PyCreeper 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>架构概览<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>PyCreeper的整体架构可以分为引擎，下载器，下载器中间件，调度器，爬虫五个部分。
+在各个部分之间传递的数据为Request/Response对象。</p>
+<p>数据的流动方向如下图的绿色箭头所示。</p>
+<div class="section" id="id2">
+<h2>各个部分的功能简述<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/structure.jpg" src="_images/structure.jpg" />
+<hr class="docutils" />
+<p><strong>引擎</strong> 是PyCreeper的核心部分，负责调度各个部分的工作。引擎在内部的实现为gevent.Pool。</p>
+<p><strong>下载器</strong> 负责下载request请求，在这里将静态请求与动态请求分别处理，静态请求使用requests库实现，
+动态请求使用selenium.webdriver实现。在请求完成后，将响应返回给引擎。</p>
+<p><strong>下载器中间件</strong> 可以理解为存在于下载器和引擎之间的钩子系统，可以通过自定义下载器中间件完成对request和response的特殊处理。</p>
+<p><strong>调度器</strong> 调度器实现的核心为gevent中的Queue和布隆过滤器，通过对requests进行判重，非重复请求入队，等待引擎取走处理。</p>
+<p><strong>爬虫</strong> 爬虫相当于对用户定义的接口，由用户来定义起始的url，对于各个request的callback以及对于爬取结果的处理方法。</p>
+</div>
+<div class="section" id="id3">
+<h2>数据流动过程<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>数据流动的过程如下面各个步骤所示：</p>
+<ol class="arabic simple">
+<li>引擎启动，将爬虫中的start_urls加入到调度器中。</li>
+<li>引擎从调度器中取得一个request。</li>
+<li>引擎将请求交给下载器处理，中间经过了下载器中间件对于request的处理。</li>
+<li>下载器根据request的类型分别操作，静态请求交给requests库，动态请求使用selenium.webdriver加载。</li>
+<li>下载器将response返回给引擎，中间经过下载器中间件对response的处理。</li>
+<li>引擎将response交给爬虫定义的处理方法。</li>
+<li>爬虫的处理方法可能返回一个request（转2），或者返回一个包含爬取结果的字典（转下一个）。</li>
+<li>引擎根据爬虫定义的对于爬取结果的处理方法，处理结果。</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">架构概览</a><ul>
+<li><a class="reference internal" href="#id2">各个部分的功能简述</a></li>
+<li><a class="reference internal" href="#id3">数据流动过程</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="prepare.html"
+                        title="previous chapter">使用前的准备</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ssettings.html"
+                        title="next chapter">settings：项目设置</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/structure.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ssettings.html" title="settings：项目设置"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="prepare.html" title="使用前的准备"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PyCreeper 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Jim Zheng.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>schedular：调度器 &#8212; PyCreeper 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="spider：爬虫" href="spider.html" />
+    <link rel="prev" title="downloader_middlewares：下载器中间件" href="downloader_middlewares.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="spider.html" title="spider：爬虫"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="downloader_middlewares.html" title="downloader_middlewares：下载器中间件"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PyCreeper 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="schedular">
+<h1>schedular：调度器<a class="headerlink" href="#schedular" title="Permalink to this headline">¶</a></h1>
+<p>调度器实现的核心是gevent之中的Queue和布隆过滤器
+（Wiki: <a class="reference external" href="https://en.wikipedia.org/wiki/Bloom_filter">https://en.wikipedia.org/wiki/Bloom_filter</a>）。
+其中，Queue保证了多个Downloader协程读取队列时的协程安全，布隆过滤器则提供了url去重功能。</p>
+<div class="section" id="enqueue-request-request">
+<h2>将请求入队：enqueue_request(request)<a class="headerlink" href="#enqueue-request-request" title="Permalink to this headline">¶</a></h2>
+<p>request入队时，首先使用布隆过滤器检查url是否已经抓取过。如果没有抓取过则直接入队，
+如果抓取过，则会输出一条logging.DEBUG信息，表示忽略了这个url。</p>
+</div>
+<div class="section" id="next-request">
+<h2>取得队列中的请求：next_request()<a class="headerlink" href="#next-request" title="Permalink to this headline">¶</a></h2>
+<p>这个方法将会从Queue中取出一条request。如果在 <strong>custom_settings</strong> 中设置了 <strong>DOWNLOAD_DELAY</strong>
+项目的话，每次取出request会等待一个固定的时间。</p>
+<p>PyCreeper将 <strong>TIMEOUT</strong> 值的3倍作为检验爬虫结束的标志。具体是指，如果3*TIMEOUT时间之内Queue为空的话，
+那么则认为爬取任务全部结束，爬虫退出。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">schedular：调度器</a><ul>
+<li><a class="reference internal" href="#enqueue-request-request">将请求入队：enqueue_request(request)</a></li>
+<li><a class="reference internal" href="#next-request">取得队列中的请求：next_request()</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="downloader_middlewares.html"
+                        title="previous chapter">downloader_middlewares：下载器中间件</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="spider.html"
+                        title="next chapter">spider：爬虫</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/schedular.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="spider.html" title="spider：爬虫"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="downloader_middlewares.html" title="downloader_middlewares：下载器中间件"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PyCreeper 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Jim Zheng.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

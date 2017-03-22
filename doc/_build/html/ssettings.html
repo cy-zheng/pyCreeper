@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>settings：项目设置 &#8212; PyCreeper 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="request对象和response对象" href="http.html" />
+    <link rel="prev" title="架构概览" href="structure.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="http.html" title="request对象和response对象"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="structure.html" title="架构概览"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PyCreeper 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="settings">
+<h1>settings：项目设置<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h1>
+<p>这篇文档主要介绍项目的设定（settings）参数和其默认值。</p>
+<div class="section" id="id1">
+<h2>如何覆盖项目的默认设定？<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>可以在您定义的爬虫中设置 <strong>custom_settings</strong> 属性，覆盖掉PyCreeper的默认设定。</p>
+<p>示例:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">custom_settings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;DOWNLOADER_MIDDLEWARES&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;pycreeper.downloader_middlewares.middlewares.UserAgentMiddleware&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="s1">&#39;pycreeper.downloader_middlewares.middlewares.RetryMiddleware&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+        <span class="s1">&#39;pycreeper.downloader_middlewares.cookies_middlewares.CookiesMiddleware&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
+        <span class="s1">&#39;pycreeper.downloader_middlewares.middlewares.EncodingDiscriminateMiddleware&#39;</span><span class="p">:</span> <span class="mi">400</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;DRIVER&#39;</span><span class="p">:</span> <span class="s1">&#39;Chrome&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;DOWNLOAD_DELAY&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;USER_AGENT_LIST&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="sd">&#39;&#39;&#39;Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36</span>
+<span class="sd">        (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36&#39;&#39;&#39;</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h2>设定的可选参数和默认值<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p><strong>LOG_LEVEL</strong></p>
+<p>该参数为byte类型，默认值为DEBUG，该参数控制PyCreeper日志的输出等级。</p>
+<p><strong>RETRY_COUNT</strong></p>
+<p>该参数为数值型，默认值为3，表示对于失败请求的最大尝试次数（该参数只对静态请求有效）。</p>
+<p><strong>RETRY_STATUS_CODES</strong></p>
+<p>该参数为list型，默认值为[500, 502, 503, 504, 400, 403, 408]，表示返回码在列表中的请求将会被重发（该参数只对静态请求有效）。</p>
+<p><strong>TIMEOUT</strong></p>
+<p>该参数为数值型，默认值为5，表示发出请求定义的超时时间（秒）。</p>
+<p><strong>MAX_REQUEST_SIZE</strong></p>
+<p>该参数为int型，默认值为20，表示可以同时进行的静态请求个数（该参数只对静态请求有效）。</p>
+<p><strong>USER_AGENT_LIST</strong></p>
+<p>该参数为list型，默认值为空列表，表示发送请求时可以携带的User-Agent（需要使用UserAgentMiddleware，该参数只对静态请求有效）。</p>
+<p><strong>DOWNLOADER_MIDDLEWARES</strong></p>
+<p>该参数为dict型，默认值为空字典，表示使用的下载器中间件。字典的key值为希望使用的中间件的reference，
+value值为该中间件的优先级，优先级越高的中间件将会越先被使用。</p>
+<p><strong>DYNAMIC_CRAWL</strong></p>
+<p>该参数为bool型，默认值为True，表示引擎是否加载WebDriver。如果在设为False的情况下发出了一系列动态请求，将会引发一系列异常。</p>
+<p><strong>DRIVER</strong></p>
+<p>该参数为byte型，默认值为Firefox，表示PyCreeper使用的Driver类型。可以选择任意一种Selenium支持的Driver，前提是需要配置好Driver的相关环境。</p>
+<p><strong>DRIVER_INIT_KWARGS</strong></p>
+<p>该参数为dict型，默认为空字典，表示启动Driver时传入的参数，您可以通过定义该值修改Driver的属性。</p>
+<p><strong>DOWNLOAD_DELAY</strong></p>
+<p>该参数为数值型，默认值为0，表示下载延迟（秒）。</p>
+<p><strong>PROXY_INTERVAL</strong></p>
+<p>该参数为数值型，默认值为3，表示每个代理使用的最大时间。使用proxy需要搭配ProxyMiddleware，
+并且此处的proxy只对静态请求有效。如果您想配置动态请求的proxy，可以设置DRIVER_INIT_KWARGS参数，在Driver启动时传入配置信息。</p>
+<p><strong>PROXY_LIST</strong></p>
+<p>该参数为list型，默认为空数组，表示请求可以用到的proxy。格式为&#8217;IP:端口号&#8217;。</p>
+<p><strong>STATIC_REQUEST_SSL_VERIFY</strong></p>
+<p>该参数为bool型，默认值为True，表示发起静态请求是，是否进行ssl认证。
+该参数用于在使用代理的情况下，https认证失败的情况。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">settings：项目设置</a><ul>
+<li><a class="reference internal" href="#id1">如何覆盖项目的默认设定？</a></li>
+<li><a class="reference internal" href="#id2">设定的可选参数和默认值</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="structure.html"
+                        title="previous chapter">架构概览</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="http.html"
+                        title="next chapter">request对象和response对象</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ssettings.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="http.html" title="request对象和response对象"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="structure.html" title="架构概览"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PyCreeper 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Jim Zheng.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

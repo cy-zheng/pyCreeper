@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>request对象和response对象 &#8212; PyCreeper 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="downloader：下载器" href="downloader.html" />
+    <link rel="prev" title="settings：项目设置" href="settings.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="downloader.html" title="downloader：下载器"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="settings.html" title="settings：项目设置"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PyCreeper 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="requestresponse">
+<h1>request对象和response对象<a class="headerlink" href="#requestresponse" title="Permalink to this headline">¶</a></h1>
+<p>request对象和response对象负责在各个PyCreeper组件之间传递信息，您在使用爬虫的过程中，会经常需要对这两个对象进行操作。</p>
+<div class="section" id="request">
+<h2>Request：自定义您的请求<a class="headerlink" href="#request" title="Permalink to this headline">¶</a></h2>
+<p>构造参数:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">body</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">cookiejar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">dynamic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">browser_actions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>url</strong></p>
+<p>请求的url</p>
+<p><strong>callback</strong></p>
+<p>请求的回调函数，如果未定义则使用Spider.parse方法处理响应。</p>
+<p><strong>method</strong></p>
+<p>支持GET型和POST型请求方法，其中，POST方法只有当dynamic=False时才会被支持，
+如果dynamic=True将会抛出一个AttributeError。</p>
+<p><strong>headers</strong></p>
+<p>该参数可以传入一个字典（dict），用于静态请求的头部信息。</p>
+<p><strong>body</strong></p>
+<p>该参数用于静态请求的请求体。</p>
+<p><strong>meta</strong></p>
+<p>该参数为字典（dict）型，用于给request携带一些参数，这些参数可能在其他模块用到。</p>
+<p><strong>encoding</strong></p>
+<p>请求的编码方式，用于给url和body编码。</p>
+<p><strong>cookiejar</strong></p>
+<p>该参数用于取出request携带的cookiejar，在构造request对象时请不要向该参数传入值，传入的cookiejar不会被PyCreeper使用到。</p>
+<p><strong>dynamic</strong></p>
+<p>该参数用于标记request是否是动态请求。</p>
+<p><strong>browser_actions</strong></p>
+<p>该参数用于定义浏览器打开指定网址之后，到提取数据之前，执行的一系列操作。该参数可以传入一个函数列表。</p>
+<p><strong>wait</strong></p>
+<p>该参数用于定义浏览器打开指定网址之后，到执行browser_actions中定义的函数之前，等待的时间。
+当网页存在大量异步加载请求的时候，这个参数格外有用。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">request对象和response对象</a><ul>
+<li><a class="reference internal" href="#request">Request：自定义您的请求</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="settings.html"
+                        title="previous chapter">settings：项目设置</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="downloader.html"
+                        title="next chapter">downloader：下载器</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/http.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="downloader.html" title="downloader：下载器"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="settings.html" title="settings：项目设置"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PyCreeper 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Jim Zheng.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>
